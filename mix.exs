@@ -20,6 +20,7 @@ defmodule B3.MixProject do
 
   defp deps do
     [
+      {:csv, "~> 3.2"},
       {:ecto_sql, "~> 3.0"},
       {:httpoison, "~> 2.2"},
       {:jason, "~> 1.4"},
