@@ -25,5 +25,5 @@ b3_operations-*.tar
 # Temporary files, for example, from tests.
 /tmp/
 
-/postgres-data/
-
+/.postgres-data/
+/.elixir_ls/
