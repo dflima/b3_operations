@@ -1,4 +1,6 @@
 defmodule B3.Endpoint do
+  @moduledoc false
+
   use Plug.{Router, Debugger, ErrorHandler}
 
   require Logger
