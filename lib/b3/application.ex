@@ -1,6 +1,4 @@
 defmodule B3.Application do
-  # See https://hexdocs.pm/elixir/Application.html
-  # for more information on OTP Applications
   @moduledoc false
 
   use Application
@@ -8,12 +6,14 @@ defmodule B3.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      # Starts a worker by calling: B3.Worker.start_link(arg)
-      # {B3.Worker, arg}
+      B3.Repo,
+      Plug.Cowboy.child_spec(
+        scheme: :http,
+        plug: B3.Endpoint,
+        options: [port: Application.get_env(:b3_operations, :port)]
+      )
     ]
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: B3.Supervisor]
     Supervisor.start_link(children, opts)
   end
