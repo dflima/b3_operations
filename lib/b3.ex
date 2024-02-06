@@ -2,6 +2,7 @@ defmodule B3 do
   @moduledoc """
   Documentation for `B3`.
   """
+  alias B3.DTO.OperationDTO
 
   @doc """
   Hello world.
@@ -16,25 +17,11 @@ defmodule B3 do
     :world
   end
 
-  @spec import_operations(Path.t()) :: any()
-  def import_operations(file_path) do
-    File.stream!(file_path)
-    |> CSV.decode(separator: ?;, headers: true)
-    |> Stream.map(fn {:ok, param} -> B3.DTO.OperationDTO.to_struct(param) end)
-    |> Stream.map(fn operation ->
-      %B3.Models.Operation{}
-      |> B3.Models.Operation.changeset(operation)
-      |> B3.Repo.insert()
-    end)
-    |> Stream.run()
-  end
-
   @spec transform_operations(Path.t()) :: any()
   def transform_operations(file_path) do
     File.stream!(file_path)
     |> CSV.decode(separator: ?;, headers: true)
-    |> Stream.map(fn {:ok, param} -> B3.DTO.OperationDTO.to_struct(param) end)
-    |> Stream.take(10)
+    |> Stream.map(&OperationDTO.from_stream/1)
     |> CSV.encode(separator: ?;, headers: true)
     |> Stream.into(File.stream!(file_path <> ".operations.csv", [:write, :utf8]))
     |> Stream.run()

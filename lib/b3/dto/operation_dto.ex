@@ -1,25 +1,33 @@
 defmodule B3.DTO.OperationDTO do
   @moduledoc false
 
-  @spec to_struct(map()) :: map()
-  def to_struct(%{
-        "AcaoAtualizacao" => _,
-        "CodigoIdentificadorNegocio" => _,
+  @derive Jason.Encoder
+  defstruct [:ticker, :date, :time, :price, :amount]
+
+  @type t :: %{
+          ticker: String.t(),
+          date: String.t(),
+          time: String.t(),
+          price: String.t(),
+          amount: String.t()
+        }
+
+  @spec from_stream({:ok, map()}) :: t()
+  def from_stream({:ok, map}), do: new(map)
+
+  @spec new(map()) :: t()
+  def new(%{
         "CodigoInstrumento" => ticker,
-        "CodigoParticipanteComprador" => _,
-        "CodigoParticipanteVendedor" => _,
         "DataNegocio" => date,
-        "DataReferencia" => _,
         "HoraFechamento" => time,
         "PrecoNegocio" => price,
-        "QuantidadeNegociada" => amount,
-        "TipoSessaoPregao" => _
+        "QuantidadeNegociada" => amount
       }) do
     %{
       ticker: ticker,
-      date: parse_date(date),
+      date: date,
       time: parse_time(time),
-      price: String.replace(price, ",", ""),
+      price: parse_price(price),
       amount: amount
     }
   end
@@ -27,6 +35,6 @@ defmodule B3.DTO.OperationDTO do
   @spec parse_time(String.t()) :: String.t()
   defp parse_time(time), do: String.slice(time, 0, 6)
 
-  @spec parse_date(String.t()) :: String.t()
-  defp parse_date(date), do: date
+  @spec parse_time(String.t()) :: String.t()
+  defp parse_price(price), do: String.replace(price, ",", "")
 end
