@@ -46,6 +46,7 @@ defmodule B3.Services.Operation do
     |> parse_operations(ticker)
   end
 
+  @spec parse_operations(list(Operation.t()), String.t()) :: OperationResponseDTO.t()
   defp parse_operations(operation_list, ticker) do
     operations = Enum.map(operation_list, &OperationResponseDTO.new/1)
 
