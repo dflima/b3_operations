@@ -1,4 +1,4 @@
-defmodule OperationServiceTest do
+defmodule B3.Services.OperationServiceTest do
   use B3.RepoCase
 
   alias Enum.EmptyError
