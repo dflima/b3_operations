@@ -20,12 +20,23 @@ defmodule B3 do
   def import_operations(file_path) do
     File.stream!(file_path)
     |> CSV.decode(separator: ?;, headers: true)
-    |> Stream.map(fn {:ok, param} -> B3.DTO.OperationDTO.to_model(param) end)
-    |> Stream.map(fn %B3.Models.Operation{} = operation ->
+    |> Stream.map(fn {:ok, param} -> B3.DTO.OperationDTO.to_struct(param) end)
+    |> Stream.map(fn operation ->
       %B3.Models.Operation{}
-      |> B3.Models.Operation.changeset(Map.from_struct(operation))
+      |> B3.Models.Operation.changeset(operation)
       |> B3.Repo.insert()
-     end)
+    end)
+    |> Stream.run()
+  end
+
+  @spec transform_operations(Path.t()) :: any()
+  def transform_operations(file_path) do
+    File.stream!(file_path)
+    |> CSV.decode(separator: ?;, headers: true)
+    |> Stream.map(fn {:ok, param} -> B3.DTO.OperationDTO.to_struct(param) end)
+    |> Stream.take(10)
+    |> CSV.encode(separator: ?;, headers: true)
+    |> Stream.into(File.stream!(file_path <> ".operations.csv", [:write, :utf8]))
     |> Stream.run()
   end
 end
