@@ -4,6 +4,9 @@ defmodule B3.Services.Operation do
   alias B3.DTO.OperationResponseDTO
   alias B3.Queries.Operation, as: OperationQuery
 
+  @spec find_by_ticker_and_date(String.t(), Date.t() | nil) :: OperationResponseDTO.t()
+  def find_by_ticker_and_date(ticker, date \\ nil)
+
   def find_by_ticker_and_date(ticker, date) when is_nil(date) do
     ticker
     |> OperationQuery.find_by_ticker()
@@ -29,10 +32,6 @@ defmodule B3.Services.Operation do
       |> Enum.max_by(& &1.max_daily_volume)
       |> Map.get(:max_daily_volume)
 
-    %{
-      ticker: ticker,
-      max_range_value: max_range_value,
-      max_daily_volume: max_daily_volume
-    }
+    OperationResponseDTO.new(ticker, max_range_value, max_daily_volume)
   end
 end
