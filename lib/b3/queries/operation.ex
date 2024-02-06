@@ -5,14 +5,22 @@ defmodule B3.Queries.Operation do
 
   import Ecto.Query, warn: false
 
-  def find_by_ticker(ticker) do
-    query =
-      from(o in Operation,
-        where: o.ticker == ^ticker,
-        group_by: [o.ticker, o.date],
-        select: [o.date, o.ticker, max(o.price), sum(o.amount)]
-      )
+  @spec find_by_ticker_and_date(String.t(), String.t()) :: list(Operation.t())
+  def find_by_ticker_and_date(ticker, date) do
+    from(o in Operation)
+    |> where([o], o.ticker == ^ticker)
+    |> where([o], o.date >= ^date)
+    |> group_by([o], [o.ticker, o.date])
+    |> select([o], [o.date, o.ticker, max(o.price), sum(o.amount)])
+    |> Repo.all()
+  end
 
-    Repo.all(query)
+  @spec find_by_ticker(String.t()) :: list(Operation.t())
+  def find_by_ticker(ticker) do
+    from(o in Operation)
+    |> where([o], o.ticker == ^ticker)
+    |> group_by([o], [o.ticker, o.date])
+    |> select([o], [o.date, o.ticker, max(o.price), sum(o.amount)])
+    |> Repo.all()
   end
 end
