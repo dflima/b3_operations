@@ -16,9 +16,12 @@ defmodule B3.Endpoint do
 
   get "/operations" do
     with %{query_params: %{"ticker" => ticker}} <- fetch_query_params(conn) do
-      response = B3.Queries.Operation.find_by_ticker(ticker) |> Enum.map(fn [date, ticker, price, amount] ->
-        %{date: date, ticker: ticker, price: price, amount: amount}
-      end)
+      response =
+        ticker
+        |> B3.Queries.Operation.find_by_ticker()
+        |> Enum.map(fn [date, ticker, price, amount] ->
+          %{date: date, ticker: ticker, price: price, amount: amount}
+        end)
 
       send_resp(conn, 200, Jason.encode!(response))
     else
