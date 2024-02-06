@@ -5,10 +5,10 @@ defmodule B3.DTO.OperationResponseDTO do
   defstruct [:ticker, :max_range_value, :max_daily_volume]
 
   @type t :: %{
-    ticker: String.t(),
-    max_range_value: float(),
-    max_daily_volume: integer()
-  }
+          ticker: String.t(),
+          max_range_value: float(),
+          max_daily_volume: integer()
+        }
 
   @spec new(list()) :: t()
   def new([_date, ticker, price, amount] = params) when is_list(params) do

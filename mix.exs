@@ -7,7 +7,9 @@ defmodule B3.MixProject do
       version: "0.1.0",
       elixir: "~> 1.16",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      elixirc_paths: elixirc_paths(Mix.env()),
+      aliases: aliases()
     ]
   end
 
@@ -15,6 +17,21 @@ defmodule B3.MixProject do
     [
       extra_applications: [:logger, :plug_cowboy, :postgrex, :ecto],
       mod: {B3.Application, []}
+    ]
+  end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
+
+  defp aliases() do
+    [
+      test: [
+        "ecto.drop --quiet",
+        "ecto.create --quiet",
+        "ecto.migrate",
+        "run priv/repo/seeds.exs",
+        "test"
+      ]
     ]
   end
 

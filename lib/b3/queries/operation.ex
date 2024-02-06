@@ -1,5 +1,6 @@
 defmodule B3.Queries.Operation do
   @moduledoc false
+
   alias B3.Repo
   alias B3.Models.Operation
 
