@@ -2,34 +2,37 @@ defmodule B3 do
   @moduledoc """
   Documentation for `B3`.
   """
+  alias B3.Cache
+  alias B3.Models.Operation
+  alias B3.Repo
   alias B3.DTO.OperationDTO
 
   @doc """
-  This function is used to transform the file from B3 into a more
-  clean and known format: "ticker;date;time;price;amount".
+  This function is used to normalize the file from B3 into
+  the following format: "ticker;date;time;price;amount".
 
   ## Examples
 
-      iex> B3.transform_operations("/tmp/25-01-2024_NEGOCIOSAVISTA.txt")
+      iex> B3.normalize_file("/tmp/25-01-2024_NEGOCIOSAVISTA.txt")
       :ok
   """
-  @spec transform_operations(Path.t()) :: any()
-  def transform_operations(file_path) do
+  @spec normalize_file(Path.t()) :: any()
+  def normalize_file(file_path) do
     File.stream!(file_path)
     |> CSV.decode(separator: ?;, headers: true)
-    |> Stream.map(&OperationDTO.from_stream/1)
+    |> Stream.map(&OperationDTO.from_external_file/1)
     |> CSV.encode(separator: ?;, headers: true)
     |> Stream.into(File.stream!(file_path <> ".operations.csv", [:write, :utf8]))
     |> Stream.run()
   end
 
   @doc """
-  This function uses data from the files created by transform_operations/1
+  This function uses data from the files created by normalize_file/1
   and inserts into the database.
 
   ## Examples
 
-      iex> B3.transform_operations("/tmp/25-01-2024_NEGOCIOSAVISTA.txt.operations.csv")
+      iex> B3.import_operations("/tmp/25-01-2024_NEGOCIOSAVISTA.txt.operations.csv")
       :ok
   """
   @spec import_operations(Path.t()) :: any()
