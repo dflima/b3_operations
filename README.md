@@ -1,21 +1,45 @@
-# B3
+# B3 Operations
 
-**TODO: Add description**
+## Running the app
 
-## Installation
+First, start the database container with:
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `b3_operations` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:b3_operations, "~> 0.1.0"}
-  ]
-end
+```shell
+docker compose up -d
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/b3_operations>.
+Extract the input files:
 
+```shell
+tar -jxvf priv/b3/operations.tar.bz2 -C priv/b3
+```
+
+Run the application with:
+
+```shell
+mix run --no-halt 
+```
+
+Or, for the interactive shell:
+
+```shell
+iex -S mix
+```
+
+Prepare the data by processing the input files:
+
+```shell
+  iex(1)> B3.import_operations
+```
+
+From here, you can either make GET requests to the API:
+
+```shell
+curl http://localhost:8001/operations\?ticker\=WING24\&DataNegocio\=2024-01-25 | jq
+```
+
+Or use the Elixir shell:
+
+```shell
+  iex(1)> B3.find_by_ticker_and_date "WING24", "2024-01-25"
+```
