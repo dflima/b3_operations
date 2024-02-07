@@ -39,12 +39,16 @@ defmodule B3 do
   def import_operations(file_path) do
     File.stream!(file_path)
     |> CSV.decode(separator: ?;, headers: true)
-    |> Stream.map(fn {:ok, operation} ->
-      %B3.Models.Operation{}
-      |> B3.Models.Operation.changeset(operation)
-      |> B3.Repo.insert()
-    end)
+    |> Stream.map(&OperationDTO.to_model/1)
+    |> Stream.chunk_every(10_000)
+    |> Stream.map(&Repo.insert_all(Operation, &1, returning: true))
+    |> Stream.map(fn {_, list} -> Cache.Operation.put_list(list) end)
     |> Stream.run()
+  end
+
+  def import_operations do
+    file_paths = Path.wildcard "./priv/b3/*.csv"
+    Enum.map(file_paths, &import_operations/1)
   end
 
   @doc """

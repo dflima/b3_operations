@@ -4,6 +4,7 @@ defmodule B3.Services.Operation do
   Provides encapsulation on the queries.
   """
 
+  alias B3.Services.Cache
   alias B3.DTO.OperationResponseDTO
   alias B3.Queries.Operation, as: OperationQuery
 
@@ -35,19 +36,23 @@ defmodule B3.Services.Operation do
   def find_by_ticker_and_date(ticker, date \\ nil)
 
   def find_by_ticker_and_date(ticker, date) when is_nil(date) do
-    ticker
-    |> OperationQuery.find_by_ticker()
-    |> parse_operations(ticker)
+    cache = Cache.get(ticker)
+    operations = if !is_nil(cache), do: cache, else: OperationQuery.find_by_ticker(ticker)
+
+    parse_operations(operations, ticker)
   end
 
   def find_by_ticker_and_date(ticker, date) do
-    ticker
-    |> OperationQuery.find_by_ticker_and_date(date)
-    |> parse_operations(ticker)
+    cache = Cache.get(ticker)
+
+    operations =
+      if !is_nil(cache), do: cache, else: OperationQuery.find_by_ticker_and_date(ticker, date)
+
+    parse_operations(operations, ticker)
   end
 
   @spec parse_operations(list(Operation.t()), String.t()) :: OperationResponseDTO.t()
-  defp parse_operations(operation_list, ticker) do
+  def parse_operations(operation_list, ticker) do
     operations = Enum.map(operation_list, &OperationResponseDTO.new/1)
 
     max_range_value =
