@@ -46,6 +46,7 @@ defmodule B3 do
     |> Stream.run()
   end
 
+  @spec import_operations() :: list()
   def import_operations do
     file_paths = Path.wildcard("./priv/b3/*.csv")
     Enum.map(file_paths, &import_operations/1)
