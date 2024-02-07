@@ -17,12 +17,6 @@ tar -jxvf priv/b3/operations.tar.bz2 -C priv/b3
 Run the application with:
 
 ```shell
-mix run --no-halt 
-```
-
-Or, for the interactive shell:
-
-```shell
 iex -S mix
 ```
 
