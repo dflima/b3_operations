@@ -6,6 +6,7 @@ defmodule B3.Application do
   @impl true
   def start(_type, _args) do
     children = [
+      {B3.Cache.Operation, B3.Cache.Operation},
       B3.Repo,
       Plug.Cowboy.child_spec(
         scheme: :http,
