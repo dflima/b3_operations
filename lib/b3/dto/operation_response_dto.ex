@@ -1,5 +1,6 @@
 defmodule B3.DTO.OperationResponseDTO do
   @moduledoc false
+  alias B3.Models.Operation
 
   @derive Jason.Encoder
   defstruct [:ticker, :max_range_value, :max_daily_volume]
@@ -12,6 +13,14 @@ defmodule B3.DTO.OperationResponseDTO do
 
   @spec new(list()) :: t()
   def new([_date, ticker, price, amount] = params) when is_list(params) do
+    %{
+      ticker: ticker,
+      max_range_value: price / 1_000,
+      max_daily_volume: amount
+    }
+  end
+
+  def new(%Operation{ticker: ticker, price: price, amount: amount}) do
     %{
       ticker: ticker,
       max_range_value: price / 1_000,
