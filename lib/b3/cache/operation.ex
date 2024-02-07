@@ -36,11 +36,3 @@ defmodule B3.Cache.Operation do
     {:reply, Map.get(state, String.to_atom(ticker)), state}
   end
 end
-
-%{
-  ticker: "WING24",
-  price: 128_445_000,
-  amount: 5,
-  time: ~T[10:41:09],
-  date: ~D[2024-02-01]
-}
