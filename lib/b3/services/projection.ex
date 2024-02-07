@@ -1,10 +1,16 @@
 defmodule B3.Services.Projection do
+  @moduledoc """
+  Service for the Operation entity.
+  Provides encapsulation for the queries and aggregation.
+  """
+
   alias B3.DTO.OperationResponseDTO
   alias B3.Repo
   alias B3.Models.Projection, as: ProjectionModel
   alias B3.Models.Operation
   alias B3.Queries.Projection, as: ProjectionQuery
 
+  @spec aggregate(list(Operation.t()) | Operation.t()) :: any()
   def aggregate(operations) when is_list(operations) do
     operations
     |> Stream.map(&aggregate/1)
@@ -40,19 +46,19 @@ defmodule B3.Services.Projection do
 
   ## Examples
 
-      iex> B3.Services.Operation.find_by_ticker_and_date("INVALID11")
+      iex> B3.Services.Projection.find_by_ticker_and_date("INVALID11")
       ** (Enum.EmptyError) empty error
 
-      iex> B3.Services.Operation.find_by_ticker_and_date("SIMH3", "2024-01-27")
+      iex> B3.Services.Projection.find_by_ticker_and_date("SIMH3", "2024-01-27")
       ** (Enum.EmptyError) empty error
 
-      iex> B3.Services.Operation.find_by_ticker_and_date("SIMH3")
+      iex> B3.Services.Projection.find_by_ticker_and_date("SIMH3")
       %{ticker: "SIMH3", max_range_value: 7.97, max_daily_volume: 900}
 
-      iex> B3.Services.Operation.find_by_ticker_and_date("WING24")
+      iex> B3.Services.Projection.find_by_ticker_and_date("WING24")
       %{ticker: "WING24", max_range_value: 129340.0, max_daily_volume: 12}
 
-      iex> B3.Services.Operation.find_by_ticker_and_date("WING24", "2024-01-27")
+      iex> B3.Services.Projection.find_by_ticker_and_date("WING24", "2024-01-27")
       %{ticker: "WING24", max_range_value: 129340.0, max_daily_volume: 3}
 
   """
