@@ -2,7 +2,7 @@ defmodule B3.DTO.OperationDTOTest do
   alias B3.DTO.OperationDTO
   use ExUnit.Case
 
-  test "from_stream/1 returns a new OperationDTO" do
+  test "from_external_file/1 returns a new OperationDTO" do
     map = %{
       "CodigoInstrumento" => "WING24",
       "DataNegocio" => "2024-01-25",
@@ -19,6 +19,6 @@ defmodule B3.DTO.OperationDTOTest do
       amount: 5
     }
 
-    ^expected = OperationDTO.from_stream({:ok, map})
+    ^expected = OperationDTO.from_external_file({:ok, map})
   end
 end
