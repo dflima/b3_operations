@@ -10,6 +10,11 @@ defmodule B3.Services.Projection do
   alias B3.Models.Operation
   alias B3.Queries.Projection, as: ProjectionQuery
 
+  @doc """
+  The aggregate function receives either an `Operation` or a list of `Operation`s.
+  It populates the `projections` table, by calculating the sum of the operation's
+  amount and checking for the higher price.
+  """
   @spec aggregate(list(Operation.t()) | Operation.t()) :: any()
   def aggregate(operations) when is_list(operations) do
     operations
