@@ -1,5 +1,6 @@
 defmodule B3.Endpoint do
   @moduledoc false
+  alias Enum.EmptyError
 
   use Plug.{Router, Debugger, ErrorHandler}
 
@@ -17,9 +18,13 @@ defmodule B3.Endpoint do
   get "/operations" do
     with %{query_params: %{"ticker" => ticker} = params} <- fetch_query_params(conn) do
       date = Map.get(params, "DataNegocio")
-      response = B3.Services.Operation.find_by_ticker_and_date(ticker, date)
 
-      send_resp(conn, 200, Jason.encode!(response))
+      try do
+        response = B3.Services.Operation.find_by_ticker_and_date(ticker, date)
+        send_resp(conn, 200, Jason.encode!(response))
+      rescue
+        _ in EmptyError -> send_resp(conn, 404, Jason.encode!(%{error: "Not found."}))
+      end
     else
       _ -> send_resp(conn, 400, "bad request")
     end
