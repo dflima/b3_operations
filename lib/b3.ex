@@ -2,7 +2,7 @@ defmodule B3 do
   @moduledoc """
   Documentation for `B3`.
   """
-  alias B3.Cache
+
   alias B3.Models.Operation
   alias B3.Repo
   alias B3.DTO.OperationDTO
@@ -42,12 +42,12 @@ defmodule B3 do
     |> Stream.map(&OperationDTO.to_model/1)
     |> Stream.chunk_every(10_000)
     |> Stream.map(&Repo.insert_all(Operation, &1, returning: true))
-    |> Stream.map(fn {_, list} -> Cache.Operation.put_list(list) end)
+    |> Stream.map(fn {_, list} -> spawn(fn -> B3.Services.Projection.aggregate(list) end) end)
     |> Stream.run()
   end
 
   def import_operations do
-    file_paths = Path.wildcard "./priv/b3/*.csv"
+    file_paths = Path.wildcard("./priv/b3/*.csv")
     Enum.map(file_paths, &import_operations/1)
   end
 
@@ -69,7 +69,7 @@ defmodule B3 do
   @spec find_by_ticker_and_date(any(), any()) :: :ok | B3.OperationResponseDTO.t()
   def find_by_ticker_and_date(ticker, date \\ nil) do
     try do
-      B3.Services.Operation.find_by_ticker_and_date(ticker, date)
+      B3.Services.Projection.find_by_ticker_and_date(ticker, date)
     rescue
       e in Enum.EmptyError ->
         IO.puts("No records found for #{ticker} and #{date}. Error: #{inspect(e)}")

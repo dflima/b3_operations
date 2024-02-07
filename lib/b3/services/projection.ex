@@ -1,11 +1,36 @@
-defmodule B3.Services.Operation do
-  @moduledoc """
-  Service for the Operation entity.
-  Provides encapsulation on the queries.
-  """
-
+defmodule B3.Services.Projection do
   alias B3.DTO.OperationResponseDTO
-  alias B3.Queries.Operation, as: OperationQuery
+  alias B3.Repo
+  alias B3.Models.Projection, as: ProjectionModel
+  alias B3.Models.Operation
+  alias B3.Queries.Projection, as: ProjectionQuery
+
+  def aggregate(operations) when is_list(operations) do
+    operations
+    |> Stream.map(&aggregate/1)
+    |> Stream.run()
+  end
+
+  def aggregate(%Operation{ticker: ticker, price: price, amount: amount, date: date} = operation) do
+    projection = ProjectionQuery.find_by_ticker_and_date(ticker, date)
+
+    try do
+      if is_nil(projection) do
+        Repo.insert(%ProjectionModel{ticker: ticker, price: price, amount: amount, date: date})
+      else
+        new_amount = amount + projection.amount
+        new_price = if price > projection.price, do: price, else: projection.price
+
+        projection
+        |> ProjectionModel.changeset(%{amount: new_amount, price: new_price})
+        |> Repo.update()
+      end
+    rescue
+      _ in Ecto.StaleEntryError ->
+        Repo.reload(projection)
+        aggregate(operation)
+    end
+  end
 
   @doc """
   Searches the database for the given ticker and optional date.
@@ -36,18 +61,18 @@ defmodule B3.Services.Operation do
 
   def find_by_ticker_and_date(ticker, date) when is_nil(date) do
     ticker
-    |> OperationQuery.find_by_ticker()
+    |> ProjectionQuery.find_by_ticker()
     |> parse_operations(ticker)
   end
 
   def find_by_ticker_and_date(ticker, date) do
     ticker
-    |> OperationQuery.find_by_ticker_and_date(date)
+    |> ProjectionQuery.find_by_ticker_since_date(date)
     |> parse_operations(ticker)
   end
 
   @spec parse_operations(list(Operation.t()), String.t()) :: OperationResponseDTO.t()
-  def parse_operations(operation_list, ticker) do
+  defp parse_operations(operation_list, ticker) do
     operations = Enum.map(operation_list, &OperationResponseDTO.new/1)
 
     max_range_value =
