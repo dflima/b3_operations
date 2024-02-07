@@ -27,3 +27,5 @@ b3_operations-*.tar
 
 /.postgres-data/
 /.elixir_ls/
+/priv/b3/*.csv
+/priv/b3/.DS_Store
