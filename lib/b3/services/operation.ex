@@ -37,7 +37,7 @@ defmodule B3.Services.Operation do
 
   def find_by_ticker_and_date(ticker, date) when is_nil(date) do
     cache = Cache.get(ticker)
-    operations = if !is_nil(cache), do: cache, else: OperationQuery.find_by_ticker(ticker)
+    operations = if is_nil(cache), do: OperationQuery.find_by_ticker(ticker), else: cache
 
     parse_operations(operations, ticker)
   end
@@ -46,7 +46,7 @@ defmodule B3.Services.Operation do
     cache = Cache.get(ticker)
 
     operations =
-      if !is_nil(cache), do: cache, else: OperationQuery.find_by_ticker_and_date(ticker, date)
+      if is_nil(cache), do: OperationQuery.find_by_ticker_and_date(ticker, date), else: cache
 
     parse_operations(operations, ticker)
   end
